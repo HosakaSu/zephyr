@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2022 TOKITA Hiroshi <tokita.hiroshi@gmail.com>
+ * Copyright (c) 2026 Liu Changjie <liucj1228@outlook.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -624,9 +625,10 @@ static void dma_gd32_isr(const struct device *dev)
 	const struct dma_gd32_config *cfg = dev->config;
 	struct dma_gd32_data *data = dev->data;
 	uint32_t errflag, ftfflag;
-	int err = 0;
 
 	for (uint32_t i = 0; i < cfg->channels; i++) {
+		int err = 0;
+
 		errflag = gd32_dma_interrupt_flag_get(cfg->reg, i,
 						      GD32_DMA_FLAG_ERRORS);
 		ftfflag =
@@ -668,6 +670,7 @@ static DEVICE_API(dma, dma_gd32_driver_api) = {
 
 #define CONFIGURE_ALL_IRQS(inst, n) LISTIFY(n, IRQ_CONFIGURE, (), inst)
 
+/* clang-format off */
 #define GD32_DMA_INIT(inst)                                                    \
 	static void dma_gd32##inst##_irq_configure(void)                       \
 	{                                                                      \
@@ -698,7 +701,8 @@ static DEVICE_API(dma, dma_gd32_driver_api) = {
                                                                                \
 	DEVICE_DT_INST_DEFINE(inst, dma_gd32_init, NULL,                       \
 			      &dma_gd32##inst##_data,                          \
-			      &dma_gd32##inst##_config, POST_KERNEL,           \
+			      &dma_gd32##inst##_config, PRE_KERNEL_1,          \
 			      CONFIG_DMA_INIT_PRIORITY, &dma_gd32_driver_api);
+/* clang-format on */
 
 DT_INST_FOREACH_STATUS_OKAY(GD32_DMA_INIT)

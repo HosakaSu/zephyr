@@ -100,6 +100,9 @@
 			interrupts = <37 0>;
 			clocks = <&cctl GD32_CLOCK_USART0>;
 			resets = <&rctl GD32_RESET_USART0>;
+			dmas = <&dma1 2 4 0 0>,
+			       <&dma1 7 4 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
@@ -109,6 +112,9 @@
 			interrupts = <38 0>;
 			clocks = <&cctl GD32_CLOCK_USART1>;
 			resets = <&rctl GD32_RESET_USART1>;
+			dmas = <&dma0 5 4 0 0>,
+			       <&dma0 6 4 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
@@ -118,6 +124,9 @@
 			interrupts = <39 0>;
 			clocks = <&cctl GD32_CLOCK_USART2>;
 			resets = <&rctl GD32_RESET_USART2>;
+			dmas = <&dma0 1 4 0 0>,
+			       <&dma0 3 4 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
@@ -127,6 +136,9 @@
 			interrupts = <52 0>;
 			clocks = <&cctl GD32_CLOCK_UART3>;
 			resets = <&rctl GD32_RESET_UART3>;
+			dmas = <&dma0 2 4 0 0>,
+			       <&dma0 4 4 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
@@ -136,6 +148,9 @@
 			interrupts = <53 0>;
 			clocks = <&cctl GD32_CLOCK_UART4>;
 			resets = <&rctl GD32_RESET_UART4>;
+			dmas = <&dma0 0 4 0 0>,
+			       <&dma0 7 4 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
@@ -145,6 +160,9 @@
 			interrupts = <71 0>;
 			clocks = <&cctl GD32_CLOCK_USART5>;
 			resets = <&rctl GD32_RESET_USART5>;
+			dmas = <&dma1 1 5 0 0>,
+			       <&dma1 6 5 0 0>;
+			dma-names = "rx", "tx";
 			status = "disabled";
 		};
 
