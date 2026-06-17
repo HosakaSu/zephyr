@@ -6,6 +6,7 @@
 /dts-v1/;
 
 #include <gd/gd32f4xx/gd32f407xe.dtsi>
+#include <zephyr/dt-bindings/dma/gd32_dma.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include "skystar_gd32f407vet6-pinctrl.dtsi"
 
@@ -58,6 +59,13 @@
 	current-speed = <115200>;
 	pinctrl-0 = <&usart0_default>;
 	pinctrl-names = "default";
+	dmas = <&dma1 7 4 GD32_DMA_PRIORITY_HIGH 0>,
+	       <&dma1 2 4 GD32_DMA_PRIORITY_HIGH 0>;
+	dma-names = "tx", "rx";
+};
+
+&dma1 {
+	status = "okay";
 };
 
 &timer1 {
