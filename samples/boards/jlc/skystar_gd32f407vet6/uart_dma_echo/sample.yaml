@@ -1,0 +1,13 @@
+sample:
+  name: SkyStar GD32F407VET6 UART DMA echo
+tests:
+  sample.boards.jlc.skystar_gd32f407vet6.uart_dma_echo:
+    platform_allow: skystar_gd32f407vet6
+    harness: console
+    harness_config:
+      type: one_line
+      regex:
+        - "UART DMA echo ready"
+    tags:
+      - serial
+      - dma
