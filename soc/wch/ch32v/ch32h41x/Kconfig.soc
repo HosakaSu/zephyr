@@ -1,0 +1,11 @@
+# Copyright (c) 2026 Liu Changjie
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_SERIES_CH32H41X
+	bool
+	select SOC_FAMILY_CH32V
+
+config SOC_SERIES
+	default "ch32h41x" if SOC_SERIES_CH32H41X
+
+rsource "Kconfig.soc.*"

@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Liu Changjie
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_SERIES_CH32H41X
+
+config SOC_CH32H417_V3F
+	# SOC_EARLY_INIT_HOOK is defined in kernel/Kconfig.init, which is not
+	# loaded by the SoC-only Kconfig.soc.* compliance environment, so the
+	# select must live in this (full-tree) Kconfig rather than Kconfig.soc.*.
+	select SOC_EARLY_INIT_HOOK

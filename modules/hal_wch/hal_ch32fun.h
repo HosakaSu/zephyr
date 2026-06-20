@@ -45,4 +45,17 @@
 #include <ch32fun.h>
 #endif /* defined(CONFIG_SOC_SERIES_QINGKE_V4F) */
 
+#if defined(CONFIG_SOC_SERIES_CH32H41X)
+#define CH32H41x 1
+/*
+ * ch32fun's CH32H41x header emits an informational #warning reminding bare-metal
+ * users that H41x GPIO output-speed bits live in their own register. Zephyr
+ * handles that in its pinctrl driver, so the reminder is harmless here. It is
+ * left visible on purpose: the proper fix is to skip the #warning under
+ * __ZEPHYR__ in the hal_wch module itself, after which the west.yml hal_wch
+ * revision can be bumped.
+ */
+#include <ch32fun.h>
+#endif /* defined(CONFIG_SOC_SERIES_CH32H41X) */
+
 #endif
