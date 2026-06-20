@@ -18,7 +18,7 @@
 		clk_hse: clk-hse {
 			#clock-cells = <0>;
 			compatible = "wch,ch32v00x-hse-clock";
-			clock-frequency = <DT_FREQ_M(25)>;
+			/* HSE crystal frequency is board-specific; set it in the board DTS. */
 			status = "disabled";
 		};
 
@@ -26,6 +26,12 @@
 			#clock-cells = <0>;
 			compatible = "wch,ch32v00x-hsi-clock";
 			clock-frequency = <DT_FREQ_M(25)>;
+			status = "disabled";
+		};
+
+		pll: pll {
+			#clock-cells = <0>;
+			compatible = "wch,ch32h41x-pll-clock";
 			status = "disabled";
 		};
 	};

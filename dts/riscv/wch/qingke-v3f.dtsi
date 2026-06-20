@@ -10,6 +10,14 @@
 	#address-cells = <1>;
 	#size-cells = <1>;
 
+	power-states {
+		run0: run0 {
+			compatible = "zephyr,power-state";
+			power-state-name = "runtime-idle";
+			substate-id = <1>;
+		};
+	};
+
 	cpus {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -21,6 +29,7 @@
 			riscv,isa-base = "rv32i";
 			riscv,isa-extensions = "i", "m", "a", "c", "zicsr", "zifencei";
 			clock-frequency = <DT_FREQ_M(120)>;
+			cpu-power-states = <&run0>;
 		};
 	};
 

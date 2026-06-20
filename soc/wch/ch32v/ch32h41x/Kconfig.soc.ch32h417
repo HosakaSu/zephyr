@@ -10,8 +10,9 @@ config SOC_CH32H417_V3F
 	select SOC_CH32H417
 	help
 	  This hidden configuration targets the QingKe V3F boot core in the
-	  CH32H417 AMP SoC. The boot core wakes the V5F application core from
-	  soc_early_init_hook() (see soc_v3f.c).
+	  CH32H417 AMP SoC. When SOC_CH32H417_BOOT_V5F is enabled, the boot core
+	  wakes the V5F application core from soc_early_init_hook() (see
+	  soc_v3f.c).
 
 config SOC_CH32H417_V5F
 	bool

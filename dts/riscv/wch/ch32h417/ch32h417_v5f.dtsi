@@ -19,10 +19,10 @@
 };
 
 &flash {
-	flash0: flash@10000 {
+	flash0: flash@8010000 {
 		compatible = "soc-nv-flash";
-		reg = <0x00010000 DT_SIZE_K(480)>;
-		ranges = <0x0 0x00010000 DT_SIZE_K(480)>;
+		reg = <0x08010000 DT_SIZE_K(480)>;
+		ranges = <0x0 0x08010000 DT_SIZE_K(480)>;
 
 		#address-cells = <1>;
 		#size-cells = <1>;
