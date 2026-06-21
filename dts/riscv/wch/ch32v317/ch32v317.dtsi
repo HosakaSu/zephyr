@@ -140,6 +140,134 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 		};
+
+		tim1: counter@40012c00 {
+			compatible = "wch,gptm";
+			reg = <0x40012c00 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM1>;
+			interrupt-parent = <&pfic>;
+			interrupts = <41>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm1: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim2: counter@40000000 {
+			compatible = "wch,gptm";
+			reg = <0x40000000 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM2>;
+			interrupt-parent = <&pfic>;
+			interrupts = <44>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm2: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim3: counter@40000400 {
+			compatible = "wch,gptm";
+			reg = <0x40000400 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM3>;
+			interrupt-parent = <&pfic>;
+			interrupts = <45>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm3: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim4: counter@40000800 {
+			compatible = "wch,gptm";
+			reg = <0x40000800 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM4>;
+			interrupt-parent = <&pfic>;
+			interrupts = <46>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm4: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim5: counter@40000c00 {
+			compatible = "wch,gptm";
+			reg = <0x40000c00 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM5>;
+			interrupt-parent = <&pfic>;
+			interrupts = <66>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm5: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim8: counter@40013400 {
+			compatible = "wch,gptm";
+			reg = <0x40013400 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM8>;
+			interrupt-parent = <&pfic>;
+			interrupts = <60>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm8: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim9: counter@40014c00 {
+			compatible = "wch,gptm";
+			reg = <0x40014c00 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM9>;
+			interrupt-parent = <&pfic>;
+			interrupts = <91>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm9: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
+
+		tim10: counter@40015000 {
+			compatible = "wch,gptm";
+			reg = <0x40015000 0x400>;
+			clocks = <&rcc CH32V20X_V30X_CLOCK_TIM10>;
+			interrupt-parent = <&pfic>;
+			interrupts = <95>;
+			channels = <4>;
+			status = "disabled";
+
+			pwm10: pwm {
+				compatible = "wch,gptm-pwm";
+				#pwm-cells = <3>;
+				status = "disabled";
+			};
+		};
 	};
 };
 
