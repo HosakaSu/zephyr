@@ -1,0 +1,46 @@
+# WCH CH395 Ethernet controller configuration options
+
+# Copyright (c) 2026 Liu Changjie <liucj1228@outlook.com>
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig ETH_CH395
+	bool "WCH CH395 Ethernet Controller"
+	default y
+	depends on DT_HAS_WCH_CH395_ENABLED
+	select GPIO
+	select SPI
+	help
+	  WCH CH395 standalone Ethernet controller with SPI interface.
+
+config ETH_CH395_RX_THREAD_STACK_SIZE
+	int "Stack size for internal CH395 monitor thread"
+	depends on ETH_CH395
+	default 1024
+	help
+	  Size of the stack used for the internal CH395 monitor thread.
+
+config ETH_CH395_RX_THREAD_PRIO
+	int "Priority for internal CH395 monitor thread"
+	depends on ETH_CH395
+	default 2
+	help
+	  Priority level for the internal CH395 monitor thread.
+
+config ETH_CH395_MONITOR_PERIOD
+	int "CH395 monitor period in milliseconds"
+	depends on ETH_CH395
+	default 500
+	help
+	  Monitor period in milliseconds for detecting and reporting link
+	  status changes to the network stack.
+
+config ETH_CH395_PHY_LINK_TIMEOUT_MS
+	int "Timeout in milliseconds for PHY link up during init"
+	depends on ETH_CH395
+	default 10000
+	help
+	  Maximum time to wait for the CH395 PHY to report link up during
+	  driver initialization before opening the MACRAW socket. Both WCH
+	  and GD32 reference implementations poll GET_PHY_STATUS until the
+	  link is up before SET_PROTO_TYPE_SN and OPEN_SOCKET_SN. Set to 0
+	  to skip the wait and open the socket immediately.

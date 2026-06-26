@@ -1,0 +1,21 @@
+/*
+ * Copyright (c) 2026 Liu Changjie <liucj1228@outlook.com>
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&spi2 {
+	pinctrl-0 = <&spi2_sck_pb13 &spi2_miso_pb14 &spi2_mosi_pb15>;
+	pinctrl-names = "default";
+	cs-gpios = <&gpiob 12 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	ch395: ethernet@0 {
+		compatible = "wch,ch395";
+		reg = <0>;
+		spi-max-frequency = <21000000>;
+		int-gpios = <&gpiob 10 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpiob 11 GPIO_ACTIVE_LOW>;
+		zephyr,random-mac-address;
+		status = "okay";
+	};
+};

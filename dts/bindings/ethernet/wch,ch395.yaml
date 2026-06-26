@@ -1,0 +1,25 @@
+# Copyright (c) 2026 Liu Changjie <liucj1228@outlook.com>
+# SPDX-License-Identifier: Apache-2.0
+
+description: WCH CH395 standalone Ethernet controller with SPI interface
+
+compatible: "wch,ch395"
+
+include: [spi-device.yaml, ethernet-controller.yaml]
+
+properties:
+  int-gpios:
+    type: phandle-array
+    required: true
+    description: Interrupt pin.
+
+      The CH395 interrupt pin is active low. If connected directly, the MCU pin
+      should be configured as active low.
+
+  reset-gpios:
+    type: phandle-array
+    required: true
+    description: Reset pin.
+
+      The CH395 reset pin is active low. If connected directly, the MCU pin
+      should be configured as active low.
