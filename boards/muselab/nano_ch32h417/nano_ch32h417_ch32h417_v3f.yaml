@@ -1,0 +1,15 @@
+identifier: nano_ch32h417/ch32h417/v3f
+name: MuseLab nanoCH32H417 (V3F waker)
+type: mcu
+arch: riscv
+toolchain:
+  - zephyr
+ram: 447
+flash: 64
+testing:
+  ignore_tags:
+    - console
+    - gpio
+    - net
+    - serial
+vendor: muselab

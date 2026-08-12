@@ -1,0 +1,6 @@
+# Copyright (c) 2026 Liu Changjie
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_NANO_CH32H417
+	select SOC_CH32H417_V3F if BOARD_NANO_CH32H417_CH32H417_V3F
+	select SOC_CH32H417_V5F if BOARD_NANO_CH32H417_CH32H417_V5F

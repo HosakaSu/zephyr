@@ -1,0 +1,12 @@
+identifier: nano_ch32h417/ch32h417/v5f
+name: MuseLab nanoCH32H417 (V5F)
+type: mcu
+arch: riscv
+toolchain:
+  - zephyr
+ram: 255
+flash: 480
+supported:
+  - gpio
+  - serial
+vendor: muselab
