@@ -141,6 +141,9 @@ static void stm32_ltdc_global_isr(const struct device *dev)
 				LTDC_LAYER(&data->hltdc, LTDC_LAYER_1)->CFBAR =
 					(uint32_t)data->front_buf;
 
+				if (CONFIG_STM32_LTDC_FB_NUM == 0) {
+					__HAL_LTDC_LAYER_ENABLE(&data->hltdc, LTDC_LAYER_1);
+				}
 				__HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&data->hltdc);
 
 				k_sem_give(&data->sem);
@@ -195,6 +198,7 @@ static int stm32_ltdc_set_yuv(const struct device *dev)
 	struct display_stm32_ltdc_data *data = dev->data;
 	LTDC_LayerFlexYUVCoPlanarTypeDef cfg = {0};
 	const struct display_stm32_ltdc_config *config = dev->config;
+	HAL_StatusTypeDef hal_ret;
 
 	/* An odd width would split a pair of pixels across two lines */
 	if ((config->width % 2U) != 0U) {
@@ -220,13 +224,14 @@ static int stm32_ltdc_set_yuv(const struct device *dev)
 
 	/* The layer cannot be reconfigured while the controller is scanning */
 	__HAL_LTDC_DISABLE(&data->hltdc);
-	if (HAL_LTDC_ConfigLayerFlexYUVCoPlanar(&data->hltdc, &cfg, LTDC_LAYER_1) != HAL_OK) {
-		__HAL_LTDC_ENABLE(&data->hltdc);
-		return -EIO;
+	hal_ret = HAL_LTDC_ConfigLayerFlexYUVCoPlanar(&data->hltdc, &cfg, LTDC_LAYER_1);
+	if (CONFIG_STM32_LTDC_FB_NUM == 0 && data->front_buf == NULL) {
+		__HAL_LTDC_LAYER_DISABLE(&data->hltdc, LTDC_LAYER_1);
+		__HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&data->hltdc);
 	}
 	__HAL_LTDC_ENABLE(&data->hltdc);
 
-	return 0;
+	return hal_ret == HAL_OK ? 0 : -EIO;
 #else
 	ARG_UNUSED(dev);
 
@@ -265,7 +270,18 @@ static int stm32_ltdc_set_pixel_format(const struct device *dev,
 		return -ENOTSUP;
 	}
 
-	hal_ret = HAL_LTDC_SetPixelFormat(&data->hltdc, ltdc_pix_fmt, 0);
+	bool defer_layer = CONFIG_STM32_LTDC_FB_NUM == 0 && data->front_buf == NULL;
+
+	if (defer_layer) {
+		/* The HAL re-enables the layer when changing its pixel format. */
+		__HAL_LTDC_DISABLE(&data->hltdc);
+	}
+	hal_ret = HAL_LTDC_SetPixelFormat(&data->hltdc, ltdc_pix_fmt, LTDC_LAYER_1);
+	if (defer_layer) {
+		__HAL_LTDC_LAYER_DISABLE(&data->hltdc, LTDC_LAYER_1);
+		__HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&data->hltdc);
+		__HAL_LTDC_ENABLE(&data->hltdc);
+	}
 	if (hal_ret != HAL_OK) {
 		return -EIO;
 	}
@@ -708,11 +724,23 @@ static int stm32_ltdc_init(const struct device *dev)
 	data->hltdc.LayerCfg[0].FBStartAdress = (uint32_t) data->frame_buffer;
 #endif
 
+	if (CONFIG_STM32_LTDC_FB_NUM == 0) {
+		/* Do not fetch pixels before the application supplies a framebuffer. */
+		__HAL_LTDC_DISABLE(&data->hltdc);
+		data->front_buf = NULL;
+		data->pend_buf = NULL;
+	}
+
 	/* Configure layer 1 (only one layer is used) */
-	/* LTDC starts fetching pixels and sending them to display after this call */
 	err = HAL_LTDC_ConfigLayer(&data->hltdc, &data->hltdc.LayerCfg[0], LTDC_LAYER_1);
 	if (err != HAL_OK) {
 		return err;
+	}
+
+	if (CONFIG_STM32_LTDC_FB_NUM == 0) {
+		__HAL_LTDC_LAYER_DISABLE(&data->hltdc, LTDC_LAYER_1);
+		__HAL_LTDC_RELOAD_IMMEDIATE_CONFIG(&data->hltdc);
+		__HAL_LTDC_ENABLE(&data->hltdc);
 	}
 
 	/* Disable layer 2, since it not used */
