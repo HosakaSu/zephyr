@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  STM32 timer output-compare channel with update-event DMA for Pulse IO.
+
+  This node is a child of an st,stm32-timers node and exclusively owns that
+  timer. Disable all sibling PWM, counter and quadrature decoder nodes.
+  Only CELL-mode transmit with idle low is supported. The single logical
+  Pulse IO channel is numbered zero, independent of st,channel.
+
+  DMA copies 16-bit duty values to the selected CCR register on timer update
+  events. The transfer begins with one idle cell to prime the preload register
+  and ends with an idle cell before completion. All cells have a fixed period;
+  duty values from zero through the configured period are supported.
+
+compatible: "st,stm32-timer-pulse-io"
+
+include: [base.yaml, pulse-io-controller.yaml, pinctrl-device.yaml]
+
+properties:
+  st,channel:
+    type: int
+    required: true
+    enum: [1, 2, 3, 4]
+    description: Timer output-compare channel routed by pinctrl.
+
+  dmas:
+    required: true
+    description: |
+      One DMA channel using the parent timer update request, not the capture
+      compare request. Transfers use 16-bit memory-to-peripheral accesses
+      with incrementing source and fixed destination. The channel-config
+      priority field selects DMA priority.
+
+  dma-names:
+    required: true
+    const: [up]
+
+  zephyr,max-cells:
+    type: int
+    required: true
+    description: |
+      Maximum cells per transmit request, from 1 to 32766. A static DMA
+      buffer holds this many 16-bit duties plus two idle cells.
+
+  "#pulse-io-cells":
+    const: 1
+
+pulse-io-cells:
+  - channel

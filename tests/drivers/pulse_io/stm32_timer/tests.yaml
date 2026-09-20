@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+tests:
+  drivers.pulse_io.stm32_timer:
+    tags:
+      - drivers
+      - pulse_io
+    filter: dt_compat_enabled("st,stm32-timer-pulse-io")
+    harness: ztest

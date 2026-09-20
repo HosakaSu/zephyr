@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config PULSE_IO_STM32_TIMER
+	bool "STM32 timer Pulse IO driver"
+	default y
+	depends on DT_HAS_ST_STM32_TIMER_PULSE_IO_ENABLED
+	depends on SOC_SERIES_STM32N6X
+	select DMA
+	select PINCTRL
+	select RESET
+	select CACHE_MANAGEMENT if DCACHE
+	help
+	  Generate fixed-period cells using a timer output-compare channel and
+	  update-event DMA. Supports synchronous CELL-mode transmit with idle
+	  low. The driver owns the whole timer; PWM and counter drivers cannot
+	  use another channel of the same timer. RX, looping, carrier modulation
+	  and RTIO are not supported. Currently supports STM32N6 GPDMA.
