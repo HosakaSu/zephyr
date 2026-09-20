@@ -1,0 +1,351 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+
+#include <st/n6/stm32n647X0.dtsi>
+#include <st/n6/stm32n647x0hxq-pinctrl.dtsi>
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
+/ {
+	model = "ALIENTEK ATK-DNN647";
+	compatible = "alientek,atk-dnn647";
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &axisram2;
+		zephyr,canbus = &fdcan3;
+	};
+
+	aliases {
+		eeprom-0 = &eeprom;
+		pwm-led0 = &lcd_backlight;
+		led0 = &led0;
+		led1 = &led1;
+		sw0 = &key0;
+		sw1 = &key1;
+		sw2 = &key2;
+		sw3 = &wk_up;
+		watchdog0 = &iwdg;
+	};
+
+	zephyr,user {
+		io-channels = <&adc1 15>;
+		buzzer-gpios = <&gpiod 3 GPIO_ACTIVE_HIGH>;
+		rs485-de-gpios = <&gpiod 15 GPIO_ACTIVE_HIGH>;
+	};
+
+	pwmleds {
+		compatible = "pwm-leds";
+
+		lcd_backlight: lcd-backlight {
+			pwms = <&pwm16 1 PWM_USEC(100) PWM_POLARITY_NORMAL>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led0: led-0 {
+			gpios = <&gpiog 10 GPIO_ACTIVE_LOW>;
+			label = "LED0";
+		};
+
+		led1: led-1 {
+			gpios = <&gpioe 10 GPIO_ACTIVE_LOW>;
+			label = "LED1";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		key0: key-0 {
+			gpios = <&gpioc 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "KEY0";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+		key1: key-1 {
+			gpios = <&gpiod 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "KEY1";
+			zephyr,code = <INPUT_KEY_1>;
+		};
+
+		key2: key-2 {
+			gpios = <&gpiog 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "KEY2";
+			zephyr,code = <INPUT_KEY_2>;
+		};
+
+		wk_up: wk-up {
+			gpios = <&gpioc 13 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+			label = "WK_UP";
+			zephyr,code = <INPUT_KEY_3>;
+		};
+	};
+};
+
+&clk_hse {
+	hse-div2;
+	clock-frequency = <DT_FREQ_M(48)>;
+	status = "okay";
+};
+
+&clk_hsi {
+	hsi-div = <1>;
+	status = "okay";
+};
+
+&pll1 {
+	clocks = <&clk_hse>;
+	div-m = <3>;
+	mul-n = <150>;
+	div-p1 = <1>;
+	div-p2 = <1>;
+	status = "okay";
+};
+
+&pll3 {
+	clocks = <&clk_hse>;
+	div-m = <3>;
+	mul-n = <125>;
+	div-p1 = <1>;
+	div-p2 = <1>;
+	status = "okay";
+};
+
+&ic1 {
+	pll-src = <1>;
+	ic-div = <3>;
+	status = "okay";
+};
+
+&ic2 {
+	pll-src = <1>;
+	ic-div = <6>;
+	status = "okay";
+};
+
+&ic6 {
+	pll-src = <3>;
+	ic-div = <2>;
+	status = "okay";
+};
+
+&ic11 {
+	pll-src = <1>;
+	ic-div = <3>;
+	status = "okay";
+};
+
+&perck {
+	clocks = <&rcc STM32_SRC_HSI PER_SEL(0)>;
+	status = "okay";
+};
+
+&cpusw {
+	clocks = <&rcc STM32_SRC_IC1 CPU_SEL(3)>;
+	clock-frequency = <DT_FREQ_M(800)>;
+	status = "okay";
+};
+
+&rcc {
+	/* IC2, IC6 and IC11 must all be enabled to select IC2 as SYSCLK. */
+	clocks = <&ic2>;
+	clock-frequency = <DT_FREQ_M(400)>;
+	ahb-prescaler = <2>;
+	timg-prescaler = <2>;
+};
+
+&usart1 {
+	clocks = <&rcc STM32_CLOCK(APB2, 4)>,
+		 <&rcc STM32_SRC_CKPER USART1_SEL(1)>;
+	pinctrl-0 = <&usart1_tx_pe5 &usart1_rx_pe6>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&crc {
+	status = "okay";
+};
+
+&iwdg {
+	status = "okay";
+};
+
+&bsec {
+	/* Required for the Ethernet MAC address derived from the device UID. */
+	status = "okay";
+};
+
+&mac {
+	pinctrl-0 = <&eth1_rmii_ref_clk_pf7
+		     &eth1_rmii_crs_dv_pf10
+		     &eth1_rmii_tx_en_pf11
+		     &eth1_rmii_txd0_pf12
+		     &eth1_rmii_txd1_pf13
+		     &eth1_rmii_rxd0_pf14
+		     &eth1_rmii_rxd1_pf15>;
+	pinctrl-names = "default";
+	phy-connection-type = "rmii";
+	phy-handle = <&eth_phy>;
+	status = "okay";
+};
+
+&mdio {
+	pinctrl-0 = <&eth1_mdio_pf4 &eth1_mdc_ph5>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	eth_phy: ethernet-phy@0 {
+		compatible = "ethernet-phy";
+		reg = <0>;
+		reset-gpios = <&gpiof 5 GPIO_ACTIVE_LOW>;
+		reset-assert-duration-us = <100000>;
+		reset-deassertion-timeout-ms = <100>;
+		default-speeds = "10BASE Half-Duplex", "10BASE Full-Duplex",
+				 "100BASE Half-Duplex", "100BASE Full-Duplex";
+	};
+};
+
+&adc1 {
+	clocks = <&rcc STM32_CLOCK(AHB1, 5)>,
+		 <&rcc STM32_SRC_CKPER ADC12_SEL(1)>;
+	clock-names = "adcx", "adc_ker";
+	pinctrl-0 = <&adc1_inp15_pf6>;
+	pinctrl-names = "default";
+	vref-mv = <1800>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	channel@f {
+		reg = <15>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 1500)>;
+		zephyr,resolution = <12>;
+	};
+};
+
+&timers16 {
+	st,prescaler = <399>;
+	status = "okay";
+
+	pwm16: pwm {
+		pinctrl-0 = <&tim16_ch1_pa3>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+&i2c4 {
+	clocks = <&rcc STM32_CLOCK(APB4, 7)>,
+		 <&rcc STM32_SRC_CKPER I2C4_SEL(1)>;
+	pinctrl-0 = <&i2c4_scl_pe13 &i2c4_sda_pe14>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	status = "okay";
+
+	eeprom: eeprom@50 {
+		compatible = "atmel,at24";
+		reg = <0x50>;
+		size = <256>;
+		pagesize = <8>;
+		address-width = <8>;
+		timeout = <5>;
+	};
+
+	qmi8658a: imu@6a {
+		compatible = "qst,qmi8658a";
+		reg = <0x6a>;
+		int-gpios = <&gpiof 3 GPIO_ACTIVE_HIGH>;
+		int-pin = <1>;
+	};
+};
+
+&ic4 {
+	pll-src = <1>;
+	ic-div = <48>;
+	status = "okay";
+};
+
+&sdmmc1 {
+	clocks = <&rcc STM32_CLOCK(AHB5, 8)>,
+		 <&rcc STM32_SRC_IC4 SDMMC1_SEL(2)>;
+	pinctrl-0 = <&sdmmc1_d0_pc8 &sdmmc1_d1_pc9 &sdmmc1_d2_pc10
+		     &sdmmc1_d3_pc11 &sdmmc1_ck_pc12 &sdmmc1_cmd_ph2>;
+	pinctrl-names = "default";
+	bus-width = <4>;
+	max-bus-freq = <25000000>;
+	clk-div = <1>;
+	status = "okay";
+
+	mmc {
+		compatible = "zephyr,sdmmc-disk";
+		disk-name = "SD";
+	};
+};
+
+&sdmmc2 {
+	clocks = <&rcc STM32_CLOCK(AHB5, 7)>,
+		 <&rcc STM32_SRC_IC4 SDMMC2_SEL(2)>;
+	pinctrl-0 = <&sdmmc2_d0_pc4 &sdmmc2_d1_pc5 &sdmmc2_d2_pc0
+		     &sdmmc2_d3_pe4 &sdmmc2_ck_pd2 &sdmmc2_cmd_pc3>;
+	pinctrl-names = "default";
+	bus-width = <4>;
+	max-bus-freq = <25000000>;
+	clk-div = <1>;
+	status = "okay";
+
+	mmc {
+		compatible = "zephyr,sdmmc-disk";
+		disk-name = "SD2";
+	};
+};
+
+&usart3 {
+	clocks = <&rcc STM32_CLOCK(APB1, 18)>,
+		 <&rcc STM32_SRC_CKPER USART3_SEL(1)>;
+	pinctrl-0 = <&usart3_tx_pe1 &usart3_rx_pd9>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&uart7 {
+	clocks = <&rcc STM32_CLOCK(APB1, 30)>,
+		 <&rcc STM32_SRC_CKPER UART7_SEL(1)>;
+	pinctrl-0 = <&uart7_tx_ph3 &uart7_rx_pe7>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&spi5 {
+	clocks = <&rcc STM32_CLOCK(APB2, 20)>,
+		 <&rcc STM32_SRC_CKPER SPI5_SEL(1)>;
+	pinctrl-0 = <&spi5_sck_pe15 &spi5_miso_ph8 &spi5_mosi_ph7>;
+	pinctrl-names = "default";
+	cs-gpios = <&gpioh 6 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&fdcan3 {
+	clocks = <&rcc STM32_CLOCK(APB1_2, 8)>,
+		 <&rcc STM32_SRC_CKPER FDCAN_SEL(1)>;
+	pinctrl-0 = <&fdcan3_tx_pe11 &fdcan3_rx_pe12>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	can-transceiver {
+		max-bitrate = <1000000>;
+	};
+};

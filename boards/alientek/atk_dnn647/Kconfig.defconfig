@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_ATK_DNN647
+
+# Use the SD subsystem to support both SDMMC controllers concurrently.
+config SDMMC_STM32
+	default n
+
+endif # BOARD_ATK_DNN647

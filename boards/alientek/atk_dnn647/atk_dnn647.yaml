@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: atk_dnn647
+name: ALIENTEK ATK-DNN647
+vendor: alientek
+type: mcu
+arch: arm
+ram: 511
+toolchain:
+  - zephyr
+  - gnuarmemb
+supported:
+  - adc
+  - can
+  - eeprom
+  - i2c
+  - pwm
+  - sd
+  - sensor
+  - spi
+  - ethernet
+  - gpio
+  - uart
+  - counter
+  - watchdog
+  - backup_sram
+  - retained_mem
+  - crc

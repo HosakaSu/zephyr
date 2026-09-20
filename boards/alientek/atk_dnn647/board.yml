@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+board:
+  name: atk_dnn647
+  full_name: ALIENTEK ATK-DNN647
+  vendor: alientek
+  socs:
+    - name: stm32n647xx

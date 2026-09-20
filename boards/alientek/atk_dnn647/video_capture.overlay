@@ -1,0 +1,245 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/display/panel.h>
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+#include <zephyr/dt-bindings/video/video-interfaces.h>
+
+/ {
+	chosen {
+		zephyr,camera = &pipe_main;
+		zephyr,display = &ltdc;
+	};
+
+	imx335_input_clock: imx335-input-clock {
+		compatible = "fixed-clock";
+		clock-frequency = <37125000>;
+		#clock-cells = <0>;
+	};
+};
+
+/* Keep video buffers below the SRAM application and OpenOCD work area. */
+&axisram1 {
+	reg = <0x34000000 DT_SIZE_K(1536)>;
+	zephyr,memory-attr = <DT_MEM_ARM_MPU_RAM_NOCACHE>;
+};
+
+&gpiog {
+	camera_enable: camera-enable-hog {
+		gpio-hog;
+		gpios = <6 GPIO_ACTIVE_HIGH>;
+		output-high;
+	};
+};
+
+/* PLL3: 48 MHz / 3 * 125 = 2 GHz; IC16: 2 GHz / 60 = 33.33 MHz. */
+&ic16 {
+	pll-src = <3>;
+	ic-div = <60>;
+	status = "okay";
+};
+
+&ic17 {
+	pll-src = <1>;
+	ic-div = <4>;
+	status = "okay";
+};
+
+&ic18 {
+	pll-src = <1>;
+	ic-div = <60>;
+	status = "okay";
+};
+
+&i2c2 {
+	clocks = <&rcc STM32_CLOCK(APB1, 22)>,
+		 <&rcc STM32_SRC_CKPER I2C2_SEL(1)>;
+	pinctrl-0 = <&i2c2_scl_pd14 &i2c2_sda_pd4>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	status = "okay";
+
+	imx335: camera@1a {
+		compatible = "sony,imx335";
+		reg = <0x1a>;
+		clocks = <&imx335_input_clock>;
+		reset-gpios = <&gpiog 4 GPIO_ACTIVE_LOW>;
+
+		port {
+			imx335_ep_out: endpoint {
+				remote-endpoint-label = "dcmipp_ep_in";
+				bus-type = <VIDEO_BUS_TYPE_CSI2_DPHY>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
+};
+
+&dcmipp {
+	status = "okay";
+
+	port {
+		dcmipp_ep_in: endpoint {
+			remote-endpoint-label = "imx335_ep_out";
+			bus-type = <VIDEO_BUS_TYPE_CSI2_DPHY>;
+			data-lanes = <1 2>;
+		};
+	};
+};
+
+&ltdc {
+	clocks = <&rcc STM32_CLOCK(APB5, 1)>,
+		 <&rcc STM32_SRC_IC16 LTDC_SEL(2)>;
+	pinctrl-0 = <&ltdc_r0_pg2 &ltdc_r1_pb1 &ltdc_r2_pb5 &ltdc_r3_pb4
+		     &ltdc_r4_ph4 &ltdc_r5_pa15 &ltdc_r6_pf8 &ltdc_r7_pg9
+		     &ltdc_g0_pg12 &ltdc_g1_pg1 &ltdc_g2_pa1 &ltdc_g3_pa0
+		     &ltdc_g4_pb15 &ltdc_g5_pb12 &ltdc_g6_pb11 &ltdc_g7_pb10
+		     &ltdc_b0_pg15 &ltdc_b1_pa7 &ltdc_b2_pa12 &ltdc_b3_pa11
+		     &ltdc_b4_pa10 &ltdc_b5_pa9 &ltdc_b6_pa8 &ltdc_b7_pa2
+		     &ltdc_de_pg13 &ltdc_clk_pa5 &ltdc_hsync_pf9 &ltdc_vsync_pg0>;
+	pinctrl-names = "default";
+	bl-ctrl-gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>;
+	width = <800>;
+	height = <480>;
+	pixel-format = <PANEL_PIXEL_FORMAT_RGB_888>;
+	status = "okay";
+
+	/* ATK-MD0430R-800480 (panel ID 0x4384). */
+	display-timings {
+		compatible = "zephyr,panel-timing";
+		de-active = <0>;
+		pixelclk-active = <0>;
+		hsync-active = <0>;
+		vsync-active = <0>;
+		hsync-len = <88>;
+		vsync-len = <40>;
+		hback-porch = <48>;
+		vback-porch = <32>;
+		hfront-porch = <13>;
+		vfront-porch = <3>;
+	};
+};
+
+/* Match the RGB interface drive speed used by the panel reference design. */
+&ltdc_r0_pg2 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r1_pb1 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r2_pb5 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r3_pb4 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r4_ph4 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r5_pa15 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r6_pf8 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_r7_pg9 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g0_pg12 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g1_pg1 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g2_pa1 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g3_pa0 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g4_pb15 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g5_pb12 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g6_pb11 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_g7_pb10 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b0_pg15 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b1_pa7 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b2_pa12 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b3_pa11 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b4_pa10 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b5_pa9 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b6_pa8 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_b7_pa2 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_de_pg13 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_clk_pa5 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_hsync_pf9 {
+	slew-rate = "very-high-speed";
+};
+
+&ltdc_vsync_pg0 {
+	slew-rate = "very-high-speed";
+};
+
+/* The LTDC driver controls PA3 as a GPIO in the preview configuration. */
+&pwm16 {
+	status = "disabled";
+};
+
+&lcd_backlight {
+	status = "disabled";
+};
