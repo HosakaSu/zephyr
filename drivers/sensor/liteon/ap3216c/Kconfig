@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config AP3216C
+	bool "LiteOn AP3216C ambient light and proximity sensor"
+	default y
+	depends on DT_HAS_LITEON_AP3216C_ENABLED
+	select I2C
+	help
+	  Enable polling of ambient light, proximity and infrared data from
+	  the AP3216C sensor. Interrupts and runtime gain changes are not supported.

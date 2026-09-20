@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: LiteOn AP3216C ambient light, proximity and infrared sensor
+
+compatible: "liteon,ap3216c"
+
+include: [sensor-device.yaml, i2c-device.yaml]
+
+properties:
+  als-gain:
+    type: int
+    default: 1
+    enum: [1, 4, 16, 64]
+    description: |
+      Ambient light gain. The default corresponds to the register reset
+      setting, which provides the widest illuminance range.

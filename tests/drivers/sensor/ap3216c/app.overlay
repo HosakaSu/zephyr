@@ -1,0 +1,30 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&i2c0 {
+	sensor0: light-sensor@1e {
+		compatible = "liteon,ap3216c";
+		reg = <0x1e>;
+		als-gain = <1>;
+	};
+
+	sensor1: light-sensor@1f {
+		compatible = "liteon,ap3216c";
+		reg = <0x1f>;
+		als-gain = <4>;
+	};
+
+	sensor2: light-sensor@20 {
+		compatible = "liteon,ap3216c";
+		reg = <0x20>;
+		als-gain = <16>;
+	};
+
+	sensor3: light-sensor@21 {
+		compatible = "liteon,ap3216c";
+		reg = <0x21>;
+		als-gain = <64>;
+	};
+};

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # zephyr-keep-sorted-start
+source "drivers/sensor/liteon/ap3216c/Kconfig"
 source "drivers/sensor/liteon/ltr55x/Kconfig"
 source "drivers/sensor/liteon/ltrf216a/Kconfig"
 # zephyr-keep-sorted-stop
