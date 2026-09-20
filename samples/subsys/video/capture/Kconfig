@@ -65,6 +65,41 @@ config VIDEO_SHELL_AND_CAPTURE
 	help
 	  If set, the video capture is enabled even if the video shell is also enabled.
 
+menuconfig SAMPLE_IMX335_ISP
+	bool "IMX335 black level, white balance and gamma processing"
+	depends on VIDEO_STM32_DCMIPP && VIDEO_IMX335 && SOC_SERIES_STM32N6X
+	help
+	  Configure the DCMIPP image processing blocks for IMX335 RAW input.
+	  Apply black level correction, fixed red/blue gains and gamma conversion.
+	  This does not provide automatic exposure or automatic white balance.
+
+if SAMPLE_IMX335_ISP
+
+config SAMPLE_IMX335_SENSOR_GAIN
+	int "Sensor gain in millidecibels"
+	range 0 72000
+	default 0
+	help
+	  Initial analogue gain, in multiples of 300 millidecibels. The video
+	  shell can adjust this value while the capture is running.
+
+config SAMPLE_IMX335_RED_GAIN
+	int "Red channel gain in thousandths"
+	range 125 8000
+	default 1000
+	help
+	  Fixed red channel gain for the lighting conditions. 1000 means unity.
+	  The green channel always uses unity gain.
+
+config SAMPLE_IMX335_BLUE_GAIN
+	int "Blue channel gain in thousandths"
+	range 125 8000
+	default 1000
+	help
+	  Fixed blue channel gain for the lighting conditions. 1000 means unity.
+
+endif # SAMPLE_IMX335_ISP
+
 config VIDEO_CAM_NUM_BUFS
 	int "Number of video buffers used for the camera"
 	default 2

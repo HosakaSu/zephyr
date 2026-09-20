@@ -212,3 +212,17 @@ References
 .. _Camera iMXRT: https://community.nxp.com/t5/i-MX-RT-Knowledge-Base/Connecting-camera-and-LCD-to-i-MX-RT-EVKs/ta-p/1122183
 .. _MT9M114 camera module: https://www.onsemi.com/PowerSolutions/product.do?id=MT9M114
 .. _OV5640 camera module: https://cdn.sparkfun.com/datasheets/Sensors/LightImaging/OV5640_datasheet.pdf
+
+IMX335 image processing on STM32N6
+*********************************
+
+``CONFIG_SAMPLE_IMX335_ISP`` enables black level correction, fixed white balance
+and gamma conversion through the DCMIPP ISP hooks. It requires the IMX335 and
+STM32N6 DCMIPP drivers. Sensor gain and the red/blue channel gains are configurable
+through ``CONFIG_SAMPLE_IMX335_SENSOR_GAIN``, ``CONFIG_SAMPLE_IMX335_RED_GAIN`` and
+``CONFIG_SAMPLE_IMX335_BLUE_GAIN``. Sensor gain uses millidecibels in steps of 300;
+color gains use thousandths, with 1000 meaning unity. Green uses unity gain.
+
+This preset does not implement automatic exposure or automatic white balance.
+The gains must be selected for the camera module and lighting conditions.
+See :zephyr:board:`atk_dnn647` for an IMX335 and RGB LCD configuration.
