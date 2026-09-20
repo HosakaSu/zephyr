@@ -1,0 +1,48 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&i2c0 {
+	sensor0: magnetometer@2c {
+		compatible = "qst,qmc6308";
+		reg = <0x2c>;
+		full-scale = <30>;
+		sampling-frequency = <10>;
+	};
+
+	sensor1: magnetometer@2d {
+		compatible = "qst,qmc6308";
+		reg = <0x2d>;
+		full-scale = <12>;
+		sampling-frequency = <50>;
+	};
+
+	sensor2: magnetometer@2e {
+		compatible = "qst,qmc6308";
+		reg = <0x2e>;
+		full-scale = <8>;
+		sampling-frequency = <100>;
+	};
+
+	sensor3: magnetometer@2f {
+		compatible = "qst,qmc6308";
+		reg = <0x2f>;
+		full-scale = <2>;
+		sampling-frequency = <200>;
+	};
+
+	sensor4: magnetometer@30 {
+		compatible = "qst,qmc6308";
+		reg = <0x30>;
+		full-scale = <30>;
+		sampling-frequency = <10>;
+	};
+
+	sensor5: magnetometer@31 {
+		compatible = "qst,qmc6308";
+		reg = <0x31>;
+		full-scale = <30>;
+		sampling-frequency = <10>;
+	};
+};

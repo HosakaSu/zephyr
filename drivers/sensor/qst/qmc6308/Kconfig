@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config QMC6308
+	bool "QST QMC6308 three-axis magnetometer"
+	default y
+	depends on DT_HAS_QST_QMC6308_ENABLED
+	select I2C
+	help
+	  Enable polling of magnetic field measurements from the QMC6308.
+	  Measurements use the chip axes and are reported in gauss.
