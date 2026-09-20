@@ -1,0 +1,7 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <st/n6/stm32n647.dtsi>
+#include <st/n6/stm32n6X0.dtsi>
