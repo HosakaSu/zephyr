@@ -74,6 +74,11 @@
 			polling-mode;
 		};
 
+		ir-receiver {
+			compatible = "gpio-ir-receiver";
+			gpios = <&test_gpio 1 GPIO_ACTIVE_LOW>;
+		};
+
 		vs1838b {
 			compatible = "vishay,vs1838b";
 			data-gpios = <&test_gpio 0 0>;

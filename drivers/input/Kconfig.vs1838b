@@ -5,6 +5,20 @@ config INPUT_VS1838B
 	bool "Vishay VS1838B infrared receiver"
 	default y
 	depends on DT_HAS_VISHAY_VS1838B_ENABLED
-	select GPIO
+	select INPUT_GPIO_IR_NEC
 	help
 	  This option enables the driver for the VS1838B infrared receiver.
+
+config INPUT_GPIO_IR_RECEIVER
+	bool "GPIO infrared receiver"
+	default y
+	depends on DT_HAS_GPIO_IR_RECEIVER_ENABLED
+	select INPUT_GPIO_IR_NEC
+	help
+	  Decode standard NEC frames from a GPIO-connected infrared receiver.
+	  Report the address and command as INPUT_MSC_SCAN events. Extended
+	  addresses and repeat frames are not decoded.
+
+config INPUT_GPIO_IR_NEC
+	bool
+	select GPIO

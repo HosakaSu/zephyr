@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: GPIO-connected demodulating infrared receiver
+
+compatible: "gpio-ir-receiver"
+
+include: base.yaml
+
+properties:
+  gpios:
+    type: phandle-array
+    required: true
+    description: GPIO carrying the demodulated infrared signal, usually active low.
