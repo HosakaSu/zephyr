@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  Capacitive touch pad with a GPIO and an external pull-up resistor.
+
+  The GPIO discharges the pad as an open-drain output, then releases it
+  and measures the time until the input reads high. Touch increases this
+  charge time. Requires a nonblocking on-chip GPIO supporting simultaneous
+  input and open-drain output. GPIO expanders are not supported.
+
+  The first 32 successful scans calibrate the untouched charge time.
+  Keep the pad untouched during calibration. The baseline is fixed until
+  reboot; changes in the external circuit or environment require calibration
+  again. Three consecutive samples beyond a threshold change the key state.
+  Timing includes GPIO access overhead and is not a capacitance measurement.
+
+compatible: "zephyr,gpio-rc-touch"
+
+include: base.yaml
+
+properties:
+  gpios:
+    type: phandle-array
+    required: true
+    description: |
+      Active-high pad GPIO with no internal pull-up or pull-down.
+      The driver enables open-drain output and input simultaneously.
+      The pad needs an external pull-up to a GPIO-compatible supply.
+
+  zephyr,code:
+    type: int
+    required: true
+    description: Input key code to report for touch and release.
+
+  poll-interval-ms:
+    type: int
+    required: true
+    description: |
+      Delay between charge measurements, during which the pad is discharged.
+      Must be at least 5 milliseconds and long enough for full discharge.
+
+  press-threshold-percent:
+    type: int
+    required: true
+    description: |
+      Charge time as a percentage of the calibrated baseline to detect touch.
+      Must be greater than release-threshold-percent and at most 1000.
+      Select thresholds using measurements with the target circuit and build.
+
+  release-threshold-percent:
+    type: int
+    required: true
+    description: |
+      Charge time as a percentage of the calibrated baseline at or below
+      which a touched pad is released. Must be greater than 100 and below
+      press-threshold-percent to provide hysteresis.

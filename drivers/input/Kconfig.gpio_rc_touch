@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+config INPUT_GPIO_RC_TOUCH
+	bool "GPIO RC touch input driver"
+	default y
+	depends on DT_HAS_ZEPHYR_GPIO_RC_TOUCH_ENABLED
+	depends on !SMP
+	select GPIO
+	select TIMING_FUNCTIONS
+	help
+	  Detect touch by measuring the charging time of a capacitive pad with
+	  an external pull-up resistor. Requires a nonblocking on-chip GPIO
+	  with simultaneous input and open-drain output, and a timing counter
+	  running at least at 1 MHz. Interrupts are masked during each charge
+	  measurement, for up to 100 microseconds plus GPIO access overhead.
+	  Keep the pad untouched during the first 32 successful scans after boot.
