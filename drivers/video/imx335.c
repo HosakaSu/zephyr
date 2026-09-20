@@ -281,6 +281,11 @@ static const struct video_reg imx335_inck_74mhz[] = {
 	{IMX335_INCKSEL4, 0x7f},
 };
 
+static const struct video_reg imx335_inck_37mhz[] = {
+	{IMX335_BCWAIT_TIME, 0x5b},        {IMX335_CPWAIT_TIME, 0x40}, {IMX335_INCKSEL1, 0x80},
+	{IMX335_INCKSEL2_PLL_IF_GC, 0x02}, {IMX335_INCKSEL3, 0x68},    {IMX335_INCKSEL4, 0x7e},
+};
+
 static const struct video_reg imx335_inck_27mhz[] = {
 	{IMX335_BCWAIT_TIME, 0x42},
 	{IMX335_CPWAIT_TIME, 0x2e},
@@ -658,6 +663,10 @@ static int imx335_set_input_clk(const struct device *dev, uint32_t rate)
 	int ret;
 
 	switch (rate) {
+	case 37125000U:
+		ret = video_write_cci_multiregs(&cfg->i2c, imx335_inck_37mhz,
+						ARRAY_SIZE(imx335_inck_37mhz));
+		break;
 	case MHZ(74):
 		ret = video_write_cci_multiregs(&cfg->i2c, imx335_inck_74mhz,
 						ARRAY_SIZE(imx335_inck_74mhz));
