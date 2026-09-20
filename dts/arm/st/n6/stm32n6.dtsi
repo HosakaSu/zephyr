@@ -1002,6 +1002,7 @@
 				clocks = <&rcc STM32_CLOCK(AHB5, 8)>;
 				resets = <&rctl STM32_RESET(AHB5, 8)>;
 				interrupts = <174 0>;
+				interrupt-names = "event";
 				status = "disabled";
 			};
 
@@ -1011,6 +1012,7 @@
 				clocks = <&rcc STM32_CLOCK(AHB5, 7)>;
 				resets = <&rctl STM32_RESET(AHB5, 7)>;
 				interrupts = <175 0>;
+				interrupt-names = "event";
 				status = "disabled";
 			};
 
