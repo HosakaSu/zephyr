@@ -23,8 +23,8 @@ This board target runs a secure application from 511 KB of AXISRAM2 at
 ``0x34180400``. The CPU runs at 800 MHz, with a 400 MHz system clock and a
 200 MHz AHB clock, using the 48 MHz HSE oscillator.
 
-External NOR flash, HyperRAM and USB are not configured by this
-board target. It does not provide an external flash bootloader or persistent
+External NOR flash and HyperRAM are not configured by this board target.
+It does not provide an external flash bootloader or persistent
 application programming. The optional video configuration below supports an
 IMX335 camera and an 800 x 480 RGB LCD.
 
@@ -128,6 +128,56 @@ The PWM backlight is available through ``PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))``.
 The camera preview overlay disables this PWM device because that configuration
 uses the LTDC driver's GPIO backlight control on the same PA3 pin.
 
+RGB LED chain
+-------------
+
+The ten baseboard WS2812 LEDs use PF1, TIM4 channel 3. The optional
+``ws2812.overlay`` routes this channel to the STM32 timer Pulse IO driver
+and exposes the chain through the LED strip API:
+
+.. code-block:: console
+
+   west build -b atk_dnn647 samples/drivers/led/led_strip -d build/ws2812 -- \
+     -DDTC_OVERLAY_FILE="$ZEPHYR_BASE/boards/alientek/atk_dnn647/ws2812.overlay" \
+     -DCONFIG_SAMPLE_LED_BRIGHTNESS=12
+   west flash -d build/ws2812
+
+The driver uses GPDMA1 channel 9 and TIM4 update request 37. It flushes the
+DMA buffer from the data cache before transmission and holds the output low
+between frames. The LED driver supplies GRB channel order and a 300-microsecond
+reset interval. ``led-strip`` is the alias for the ten-pixel device.
+
+TIM4 is reserved exclusively for Pulse IO in this configuration. The overlay
+disables the PWM child and removes ``zephyr,user`` property ``pwms``; the PF0
+filtered PWM output cannot be used concurrently. Other timer users must also
+remain disabled. The backend supports synchronous CELL-mode transmit with
+idle low; receive, looping and carrier modulation are not supported.
+
+Capacitive touch pad
+--------------------
+
+TPAD shares PF6 with the potentiometer. With the board powered off, move
+P14 from pins 2-3 to pins 1-2 to select TPAD. Its external 100-kohm resistor
+charges the pad from 3.3 V. Enable ``tpad.overlay`` to disable ADC1 and
+instantiate the ``zephyr,gpio-rc-touch`` input device:
+
+.. code-block:: console
+
+   west build -b atk_dnn647 samples/subsys/input/input_dump -d build/tpad -- \
+     -DDTC_OVERLAY_FILE="$ZEPHYR_BASE/boards/alientek/atk_dnn647/tpad.overlay"
+   west flash -d build/tpad
+
+Keep TPAD untouched for the first second after startup. The driver calibrates
+from 32 successful scans and reports ``INPUT_KEY_4`` press and release events.
+It uses three consecutive measurements and separate thresholds for press and
+release. Timing includes GPIO access overhead; thresholds may need adjustment
+for a different build or external circuit. The baseline is fixed until reboot.
+
+The driver masks interrupts during each charge measurement, with a timeout
+of 100 microseconds plus GPIO access overhead, and discharges the pad between
+scans. The overlay cannot be used with the PF6 ADC sample. Restore P14 pins
+2-3 and build without the overlay to use the potentiometer again.
+
 Serial expansion
 ----------------
 
@@ -150,6 +200,99 @@ The SPI5 wireless socket supplies PH6 as chip select 0. Applications can add
 an appropriate SPI child node in an overlay when a module is fitted. The
 socket's PD13 CE and PD11 interrupt signals are module-specific and are not
 claimed by the base configuration.
+
+USB device
+----------
+
+The USB SLAVE Type-C connector uses OTG1 with P11 jumpers 1-3 and 2-4.
+The board enables this controller as ``zephyr_udc0`` with its embedded
+high-speed PHY. The PHY uses the 24 MHz HSE/2 clock derived from the board's
+48 MHz oscillator. USB device applications select the USB stack and classes;
+the console remains on USART1.
+
+Connect a USB data cable from USB SLAVE to the host. The USB HOST Type-A
+connector shares the data lines and must remain unused during device
+operation. PG5 controls the Type-A port's power switch; device applications
+must leave that switch off. P11 jumpers 3-5 and 4-6 select OTG2 instead and
+do not match the default board configuration.
+
+Build the CDC ACM echo sample to test enumeration and bidirectional data:
+
+.. code-block:: console
+
+   west build -b atk_dnn647 samples/subsys/usb/cdc_acm -d build/usb-cdc
+   west flash -d build/usb-cdc
+
+On Linux, the device appears as a new ``/dev/ttyACM*`` port. Open that port
+with DTR asserted and local echo disabled; bytes sent to it are echoed by
+the firmware. The debug probe and USB-to-UART adapter can also create serial
+ports, so identify the CDC ACM sample by its USB descriptors.
+
+Infrared receiver
+-----------------
+
+The baseboard's LF0038GKLL-1 infrared receiver connects to PE9. The
+``gpio-ir-receiver`` node uses the shared GPIO NEC decoder. Standard NEC
+address and command bytes are reported as ``INPUT_EV_DEVICE`` events with
+code ``INPUT_MSC_SCAN`` and value ``(address << 8) | command``. Applications
+map these scan codes to actions. Extended NEC addresses and repeat frames
+are not decoded.
+
+Build the input event sample, then point the supplied remote at the receiver
+and press and release a button:
+
+.. code-block:: console
+
+   west build -b atk_dnn647 samples/subsys/input/input_dump -d build/ir
+   west flash -d build/ir
+
+The USART1 console prints the received scan codes. GPIO edge interrupts
+capture the demodulated signal; TIM1 is not required.
+
+Ambient light and proximity
+---------------------------
+
+The baseboard AP3216C (U28) connects to I2C4 at address 0x1e. The board
+selects an ambient light gain of 4. Enable ``CONFIG_SENSOR`` to use the
+``ap3216c`` device with the polling sensor API. Its interrupt output is not
+connected to the MCU.
+
+``SENSOR_CHAN_LIGHT`` returns nominal illuminance in lux using the
+Rev. 0.86 datasheet conversion factors. This does not calibrate the sensor
+or compensate for an optical cover. ``SENSOR_CHAN_PROX`` returns the
+hardware object-detection flag, using the sensor's reset threshold settings.
+
+The header :file:`include/zephyr/drivers/sensor/ap3216c.h` provides
+``SENSOR_CHAN_AP3216C_ALS_RAW``, ``SENSOR_CHAN_AP3216C_IR_RAW`` and
+``SENSOR_CHAN_AP3216C_PROX_RAW`` for ADC counts. Proximity counts are not a
+distance measurement, and infrared counts are not lux. Cast these private
+channel identifiers to ``enum sensor_channel`` when calling the sensor API.
+The driver returns ``-ERANGE`` for affected infrared or proximity channels
+when the sensor reports infrared overflow; ambient light remains available.
+
+Use ``sensor get light-sensor@1e`` in the peripheral shell for standard
+channels. Applications can fetch the raw channels to compare readings with
+the sensor exposed, shaded, or approached by a nearby object. Poll at an
+interval of at least 300 ms to allow conversions to complete.
+
+Magnetometer
+------------
+
+The baseboard QMC6308 (U7) connects to I2C4 at address 0x2c through the
+board's 1.8 V level shifters. Its ``qmc6308`` node selects normal measurement
+mode at 10 Hz and a full-scale range of +/-30 gauss. Applications can set
+``sampling-frequency`` and ``full-scale`` in a devicetree overlay.
+
+Enable ``CONFIG_SENSOR`` and use ``SENSOR_CHAN_MAGN_XYZ`` or the individual
+magnetic channels. Values are in gauss in the chip's coordinate system;
+the driver applies no board-specific axis inversion or compass calibration.
+A fetch returns ``-EAGAIN`` if no new measurement is ready and ``-ERANGE``
+if the sensor reports overflow. Reading the status register clears these
+flags, so applications must not read it independently while using the driver.
+
+The peripheral shell command ``sensor get magnetometer@2c`` reads the
+magnetic channels. Changes during board rotation verify sensor response;
+heading estimation also needs mounting alignment and magnetic calibration.
 
 CAN
 ---

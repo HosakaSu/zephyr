@@ -1,0 +1,23 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	zephyr,user {
+		/delete-property/ io-channels;
+	};
+
+	tpad: touch-pad {
+		compatible = "zephyr,gpio-rc-touch";
+		gpios = <&gpiof 6 GPIO_ACTIVE_HIGH>;
+		zephyr,code = <INPUT_KEY_4>;
+		poll-interval-ms = <10>;
+		press-threshold-percent = <125>;
+		release-threshold-percent = <115>;
+	};
+};
+
+&adc1 {
+	status = "disabled";
+};

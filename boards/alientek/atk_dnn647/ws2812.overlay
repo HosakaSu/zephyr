@@ -1,0 +1,48 @@
+/*
+ * SPDX-FileCopyrightText: Copyright The Zephyr Project Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/led/led.h>
+
+/ {
+	aliases {
+		led-strip = &rgb_strip;
+	};
+
+	zephyr,user {
+		/delete-property/ pwms;
+	};
+
+	rgb_strip: led-strip {
+		compatible = "worldsemi,ws2812-pulse-io";
+		pulse-ios = <&tim4_pulse 0>;
+		chain-length = <10>;
+		color-mapping = <LED_COLOR_ID_GREEN LED_COLOR_ID_RED LED_COLOR_ID_BLUE>;
+		reset-delay = <300>;
+	};
+};
+
+&timers4 {
+	st,prescaler = <0>;
+	status = "okay";
+
+	pwm {
+		status = "disabled";
+	};
+
+	tim4_pulse: pulse-io {
+		compatible = "st,stm32-timer-pulse-io";
+		#pulse-io-cells = <1>;
+		st,channel = <3>;
+		pinctrl-0 = <&tim4_ch3_pf1>;
+		pinctrl-names = "default";
+		dmas = <&gpdma1 9 37 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_HIGH)>;
+		dma-names = "up";
+		zephyr,max-cells = <240>;
+	};
+};
+
+&gpdma1 {
+	status = "okay";
+};

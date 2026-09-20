@@ -22,6 +22,8 @@ supported:
   - ethernet
   - gpio
   - uart
+  - udc
+  - usb_device
   - counter
   - watchdog
   - backup_sram
